@@ -22,8 +22,11 @@ $app->get('/name/:name', function ($name) use ($app) {
 
 // Metaphone route
 $app->get('/metaphone/:name', function ($name) use ($app) {
-    $filter = "PartitionKey eq '" . trim($name) . "' ";
-    $filter.= "or PartitionKey eq 'org:" . trim($name) . "'";
+    // Metaphone only has the following characters, according to wiki
+    $name = preg_replace("/[^0BFHJKLMNPRSTWXYAEIOU]/", '', $name);
+    $filter = "PartitionKey eq '" . $name . "' ";
+    $filter.= "and (RowKey eq 'org:" . $name . "'";
+    $filter.= "or RowKey eq 'name:" . $name . "')";
 
     try {
         $time_start = $app->timer;
