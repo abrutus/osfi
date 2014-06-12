@@ -2,14 +2,17 @@
 require_once './vendor/autoload.php';
 use WindowsAzure\Common\ServicesBuilder;
 use WindowsAzure\Table\Models\Entity;
-// Bootstrap
-$app = new \Slim\Slim();
+// Bootstrap with config
+$app = new \Slim\Slim(['table_name' => 'osfi', 'conn_string' => getenv('CUSTOMCONNSTR_OSFI_CONN_STRING')]);
 $app->view(new \JsonApiView());
 $app->add(new \JsonApiMiddleware());
-$app->conn_string = getenv('CUSTOMCONNSTR_OSFI_CONN_STRING');
-$app->table_name = "osfi";
+// Custom methods
+$app->timer = function() {
+    list($usec, $sec) = explode(" ", microtime());
+    return ((float)$usec + (float)$sec);
+};
 $app->container->singleton('tableClient', function () use ($app) {
-    return ServicesBuilder::getInstance()->createTableService($app->conn_string);
+    return ServicesBuilder::getInstance()->createTableService($app->config('conn_string'));
 });
 
 // Name route
@@ -23,9 +26,9 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
     $filter.= "or PartitionKey eq 'org:" . trim($name) . "'";
 
     try {
-        $time_start = microtime_float();
-        $result = $app->tableClient->queryEntities($app->table_name, $filter);
-        $time_end = microtime_float();
+        $time_start = $app->timer;
+        $result = $app->tableClient->queryEntities($app->config('table_name'), $filter);
+        $time_end = $app->timer;
         $time = $time_end - $time_start;
     }
     catch(ServiceException $e){
