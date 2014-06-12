@@ -23,10 +23,13 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
     $filter.= "or PartitionKey eq 'org:" . trim($name) . "'";
 
     try {
+        $time_start = microtime_float();
         $result = $app->tableClient->queryEntities($app->table_name, $filter);
+        $time_end = microtime_float();
+        $time = $time_end - $time_start;
     }
     catch(ServiceException $e){
-        $app->render(200, [
+        $app->render(500, [
             'code' => $e->getCode(),
             'msg' => $e->getMessage(),
             ]);
@@ -43,6 +46,7 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
     }
     $app->render(200, [
         'count' => count($entities),
+        'time' => $time,
         'entities' => array_values($result_array),
     ]);
 });
