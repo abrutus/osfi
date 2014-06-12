@@ -1,0 +1,25 @@
+{
+    "name": "abrutus/osfi",
+    "description": "osfi check api",
+    "authors": [
+        {
+            "name": "Andre Brutus",
+            "email": "andre@brut.us"
+        }
+    ],
+    "require": {
+        "slim/slim": "2.*",
+        "entomb/slim-json-api": "dev-master",
+        "microsoft/windowsazure": "*",
+        "pear-pear.php.net/http_request2": "*",
+        "pear-pear.php.net/mail_mime": "*",
+        "pear-pear.php.net/mail_mimedecode": "*"
+    },
+    "repositories": [
+        {
+            "type": "pear",
+            "url": "http://pear.php.net"
+        }
+    ],
+        "minimum-stability": "dev"
+}
