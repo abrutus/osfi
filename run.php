@@ -22,7 +22,7 @@ $ENTITIY_LIST = "http://www.osfi-bsif.gc.ca/Eng/Docs/indstld.txt";
 
 // Toggle for turning off features
 $UPDATE_ORGS = TRUE;
-$UPDATE_NAMES = FALSE;
+$UPDATE_NAMES = TRUE;
 
 // Closest thing to db object
 $tableRestProxy = ServicesBuilder::getInstance()->createTableService($CONN_STRING);
@@ -35,12 +35,12 @@ function pc_permute($items, $perms = [], &$return) {
         $return[] = $perms;
     }  else {
         for ($i = count($items) - 1; $i >= 0; --$i) {
-             $newitems = $items;
-             $newperms = $perms;
-             list($foo) = array_splice($newitems, $i, 1);
-             array_unshift($newperms, $foo);
-             pc_permute($newitems, $newperms, $return);
-         }
+            $newitems = $items;
+            $newperms = $perms;
+            list($foo) = array_splice($newitems, $i, 1);
+            array_unshift($newperms, $foo);
+            pc_permute($newitems, $newperms, $return);
+        }
     }
 }
 
@@ -79,6 +79,7 @@ function generate_keys(array $sample) {
  * End accessory functions, start WebJob logic
  */
 
+$org_inserts = $name_inserts = 0;
 
 if($UPDATE_ORGS) {
     $fd = fopen($ORG_LIST, "r");
@@ -113,11 +114,12 @@ if($UPDATE_ORGS) {
     foreach($organizations as $org) {
         $entity = new Entity;
         // set metaphone of the organization name as the partition key (index).
-        $entity->setPartitionKey("org:" .$org[4]);
-        $entity->setRowKey("org:" . str_replace(["/","\\","#","?"], "", $org[1]));
+        $entity->setPartitionKey($org[4]);
+        $entity->setRowKey("org:" . $org[4]);
         $entity->addProperty("match", EdmType::STRING, json_encode(array_combine($headers, $org)));
         try {
             $tableRestProxy->insertOrReplaceEntity($TABLE_NAME, $entity);
+            $org_inserts++;
         }
         catch(Exception $e){
             echo $e;
@@ -125,6 +127,7 @@ if($UPDATE_ORGS) {
         }
     }
 }
+
 $organizations = null;
 
 /****
@@ -144,6 +147,7 @@ if($UPDATE_NAMES) {
             $persons[] = $row;
         }
     }
+
     fclose($fd);
     $headers = array_shift($persons);
 
@@ -189,17 +193,19 @@ if($UPDATE_NAMES) {
             $strkey = metaphone($glued);
             $entity = new Entity;
             $entity->setPartitionKey($strkey);
-            $entity->setRowKey("name:" . str_replace(["/","\\","#","?"], "", $glued));
+            $entity->setRowKey("name:" . str_replace(["/","\\","#","?"], "", $strkey));
 
             $entity->addProperty("match", EdmType::STRING, json_encode(array_combine($headers, $person)));
             try{
                 $tableRestProxy->insertOrReplaceEntity($TABLE_NAME, $entity);
+                $name_inserts++;
             }
             catch(Exception $e){
                 echo $e;
                 print_r($entity);
             }
         }
+        echo "Name: " . join(" ", $names) . " Inserts: " . $name_inserts . PHP_EOL;
     }
 }
-
+echo "Total Inserts:" . $name_inserts + $org_inserts;
