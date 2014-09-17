@@ -1,8 +1,4 @@
 <?php
-$app_name = "risk:osfi";
-if (extension_loaded('newrelic')) {
-      newrelic_set_appname($name);
-}
 require_once './vendor/autoload.php';
 use WindowsAzure\Common\ServicesBuilder;
 use WindowsAzure\Table\Models\Entity;
@@ -37,7 +33,6 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
         $result = $app->tableClient->queryEntities($app->config('table_name'), $filter);
         $time_end = $app->timer;
         $time = $time_end - $time_start;
-        newrelic_custom_metric("tablestore_request", $time*1000);
     }
     catch(ServiceException $e){
         $app->render(500, [
