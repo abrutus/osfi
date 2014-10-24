@@ -38,6 +38,7 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
         $app->render(500, [
             'code' => $e->getCode(),
             'msg' => $e->getMessage(),
+            'filter' => $filter,
             ]);
         return;
     }
