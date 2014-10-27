@@ -30,7 +30,7 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
 
     try {
         $time_start = $app->timer;
-        $result = $app->tableClient->queryEntities($app->config('table_name'), $filter);
+        $result = []; //$app->tableClient->queryEntities($app->config('table_name'), $filter);
         $time_end = $app->timer;
         $time = $time_end - $time_start;
     }
@@ -43,7 +43,7 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
         return;
     }
 
-    $entities = $result->getEntities();
+    $entities = $result; //->getEntities();
     $result_array = [];
     // multiple results per key, remove duplicates by hashing to the unique id
     foreach ($entities as $entity) {
