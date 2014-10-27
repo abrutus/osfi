@@ -25,12 +25,12 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
     // Metaphone only has the following characters, according to wiki
     $name = preg_replace("/[^0BFHJKLMNPRSTWXYAEIOU]/", '', $name);
     $filter = "PartitionKey eq '" . $name . "' ";
-    $filter.= "and (RowKey eq 'org:" . $name . "'";
-    $filter.= "or RowKey eq 'name:" . $name . "')";
+    $filter.= "and RowKey eq 'org:" . $name . "'";
+    //$filter.= "or RowKey eq 'name:" . $name . "')";
 
     try {
         $time_start = $app->timer;
-        $result = []; //$app->tableClient->queryEntities($app->config('table_name'), $filter);
+        $result = $app->tableClient->queryEntities($app->config('table_name'), $filter);
         $time_end = $app->timer;
         $time = $time_end - $time_start;
     }
@@ -43,7 +43,7 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
         return;
     }
 
-    $entities = $result; //->getEntities();
+    $entities = $result->getEntities();
     $result_array = [];
     // multiple results per key, remove duplicates by hashing to the unique id
     foreach ($entities as $entity) {
