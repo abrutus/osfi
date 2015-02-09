@@ -58,4 +58,38 @@ $app->get('/metaphone/:name', function ($name) use ($app) {
     ]);
 });
 
+$app->get('/exactname/:name', function ($name) use ($app) {
+    // @TODO call the same method to remove duplicate code
+    $filter = "PartitionKey eq '" . $name . "' ";
+    $filter.= "and RowKey eq 'exact-name:" . $name . "' ";
+    try {
+        $time_start = $app->timer;
+        $result = $app->tableClient->queryEntities($app->config('table_name'), $filter);
+        $time_end = $app->timer;
+        $time = $time_end - $time_start;
+    }
+    catch(ServiceException $e){
+        $app->render(500, [
+            'code' => $e->getCode(),
+            'msg' => $e->getMessage(),
+            'filter' => $filter,
+            ]);
+        return;
+    }
+
+    $entities = $result->getEntities();
+    $result_array = [];
+    // multiple results per key, remove duplicates by hashing to the unique id
+    foreach ($entities as $entity) {
+        $parsed = json_decode(utf8_decode($entity->getPropertyValue("match")));
+        $id = current(explode(".", current($parsed)));
+        $result_array[$id] = $parsed;
+    }
+    $app->render(200, [
+        'count' => count($entities),
+        'time' => $time,
+        'entities' => array_values($result_array),
+    ]);
+});
+
 $app->run();

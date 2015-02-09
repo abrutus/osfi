@@ -194,8 +194,15 @@ if($UPDATE_NAMES) {
             $entity = new Entity;
             $entity->setPartitionKey($strkey);
             $entity->setRowKey("name:" . str_replace(["/","\\","#","?"], "", $strkey));
-
             $entity->addProperty("match", EdmType::STRING, json_encode(array_combine($headers, $person)));
+            # exact name match
+            $name = preg_replace("/[^A-Za-z0-9 ]/", '', transliterator_transliterate("Any-Latin; Latin-ASCII; Upper()", $glued));
+            $separated_by_lines = ltrim(join("-", array_filter(explode(" ", $name))), "-");
+            $entity = new Entity;
+            $entity->setPartitionKey($separated_by_lines);
+            $entity->setRowKey("exact-name:" . str_replace(["/","\\","#","?"], "", $separated_by_lines));
+            $entity->addProperty("match", EdmType::STRING, json_encode(array_combine($headers, $person)));
+
             try{
                 $tableRestProxy->insertOrReplaceEntity($TABLE_NAME, $entity);
                 $name_inserts++;
