@@ -31,7 +31,7 @@ $app->get('/osfi/exactname/:name', function ($name) use ($app) {
 
 $app->get('/ofac/exactname/:name', function ($name) use ($app) {
     $time_start = $app->timer;
-    $result_array = Ofac::query(Osfi::TYPE_EXACT, $app->tableClient, 'ofac', $name);
+    $result_array = Ofac::query(Ofac::TYPE_EXACT, $app->tableClient, 'ofac', $name);
     $time_end = $app->timer;
     $time = $time_end - $time_start;
 
