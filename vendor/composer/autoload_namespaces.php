@@ -7,5 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'WindowsAzure\\' => array($vendorDir . '/microsoft/windowsazure'),
+    'WePay' => array($baseDir . '/src'),
+    'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
     'Slim' => array($vendorDir . '/slim/slim'),
 );
