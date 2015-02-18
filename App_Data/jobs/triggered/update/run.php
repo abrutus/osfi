@@ -7,7 +7,7 @@
  * which meeans that there are many writes per name, Combinations = 2^n -1 and and for each combination there is
  * a permutation which is n!
  */
-require_once '../../../../vendor/autoload.php';
+require_once 'D:/site/site/wwwroot/vendor/autoload.php';
 use WindowsAzure\Common\ServicesBuilder;
 use WindowsAzure\Table\Models\Entity;
 use WindowsAzure\Table\Models\EdmType;
