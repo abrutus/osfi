@@ -19,7 +19,6 @@ $app->container->singleton('tableClient', function () use ($app) {
     return ServicesBuilder::getInstance()->createTableService($app->config('conn_string'));
 });
 
-$app->get('/exactname/:name', function ($name) use ($app) { $app->redirect('/osfi/exactname/' . $name, 301); });
 $app->get('/osfi/exactname/:name', function ($name) use ($app) {
     $time_start = $app->timer;
     $result_array = Osfi::query(Osfi::TYPE_EXACT, $app->tableClient, 'osfi', $name);
@@ -38,4 +37,8 @@ $app->get('/ofac/exactname/:name', function ($name) use ($app) {
 
     $app->render(200, ['count' => count($result_array), 'time' => $time, 'entities' => $result_array, ]);
 });
+
+// Legacy routes to be deprecated next version
+$app->get('/exactname/:name', function ($name) use ($app) { $app->redirect('/osfi/exactname/' . $name, 301); });
+$app->get('/metaphone/:name', function ($name) use ($app) { $app->redirect('/osfi/exactname/' . $name, 301); });
 $app->run();
