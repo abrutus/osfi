@@ -7,10 +7,7 @@ Webjob
 ------
 A [webjob](http://azure.microsoft.com/en-us/documentation/articles/web-sites-create-web-jobs/) is implemented in the `run.php` file, which downloads the latest data from the OSFI endpoints and inserts it into the the database. You can simply call `php run.php` locally to populate the database or alternatively you can deploy to azure by doing the following:
 
-1. Set the `CUSTOMCONNSTR_OSFI_CONN_STRING` environment variable to your own credentials
-2. Run `composer update`
-3. Zip the inside of the project directory and upload to azure via the box in management console
-
+The webjob is scheduled to execute on a weekly basis.
 
 REST Api
 --------
