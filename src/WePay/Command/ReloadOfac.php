@@ -69,7 +69,6 @@ class ReloadOfac  extends Command
                 }
             }
         }
-        die(" {$this->counter} records");
         $this->azure($handle_fd);
     }
     protected function azure(&$handles) {

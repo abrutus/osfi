@@ -20,7 +20,10 @@ class PersistAzure {
     public $service;
     public $operations;
     const TABLE_NAME = "ofac";
-    const BATCH_SIZE = 100;
+    const BATCH_SIZE = 99;
+    public $total = 0;
+    public $rowkeys = [];
+
     public function __construct() {
         $CONN_STRING = getenv('CUSTOMCONNSTR_OSFI_CONN_STRING');
         $this->service = ServicesBuilder::getInstance()->createTableService($CONN_STRING);
@@ -28,19 +31,24 @@ class PersistAzure {
     }
     public function add($firstLetter, $key, $payload) {
         $entity = new Entity;
-        // set metaphone of the organization name as the partition key (index).
         $entity->setPartitionKey("starts-with:$firstLetter");
         $entity->setRowKey($key);
         $entity->addProperty("match", EdmType::STRING, json_encode($payload));
-        $this->operations->addInsertOrReplaceEntity(self::TABLE_NAME, $entity);
+        // cant have two duplicate rowkeys in the same batch
+        if(!isset($this->rowkeys[$key])) {
+            $this->operations->addInsertOrReplaceEntity(self::TABLE_NAME, $entity);
+            $this->rowkeys[$key] = true;
+        }
         if(++$this->op_count>= self::BATCH_SIZE) {
             $this->flush();
         }
+        echo ++$this->total . " - Adding $key\n";
     }
     public function flush() {
-        $this->service->batch($this->operations);
+        print_r($this->service->batch($this->operations));
         $this->op_count = 0;
         $this->operations = new BatchOperations();
+        echo $this->total . " Flushing \n";
 
     }
     public function __destruct() {

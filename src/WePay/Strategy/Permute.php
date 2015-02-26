@@ -80,7 +80,11 @@ class Permute implements Strategy {
     }
     public function __construct($name) {// (\ExactName $name) {
         // get cleaned up name
-        $this->permutations = $this->generate_keys($this->split($name));
+        $split = $this->split($name);
+        if(count($split) > 1)
+            $this->permutations = $this->generate_keys($this->split($name));
+        else
+            $this->permutations = $split;
         // get parts of name
     }
 

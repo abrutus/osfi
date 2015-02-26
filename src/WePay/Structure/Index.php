@@ -27,7 +27,11 @@ class Index {
     {
         $flattened = [];
         foreach($array as $index_group) {
+            if(!is_array($index_group)) {
+                $index_group = [$index_group];
+            }
             $flattened [] = join(self::SEPARATOR, $index_group);
+
         }
         return $flattened;
         // Remove empty, retain unique after merging
