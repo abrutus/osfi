@@ -53,7 +53,12 @@ class ReloadOfac  extends Command
         $handle_fd  = [];
         $handles    = array_merge(range('A', 'Z'), range(0, 9));
         foreach ($handles as $letter) {
-            $handle_fd[$letter] = fopen("./temp/" . $letter . ".txt", "w+");
+            $filename = "./temp/" . $letter . ".txt";
+            $dirname = dirname($filename);
+            if (!is_dir($dirname)){
+                mkdir($dirname, 0755, true);
+            }
+            $handle_fd[$letter] = fopen($filename, "w+");
         }
         foreach($class_files as $class => $files) {
             foreach ($files as $file) {
