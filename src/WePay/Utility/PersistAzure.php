@@ -45,11 +45,15 @@ class PersistAzure {
         echo ++$this->total . " - Adding $key\n";
     }
     public function flush() {
-        print_r($this->service->batch($this->operations));
+        try {
+        $this->service->batch($this->operations);
         $this->op_count = 0;
         $this->operations = new BatchOperations();
         echo $this->total . " Flushing \n";
-
+        } catch(\Exception $e) {
+            echo "Failed " . $e;
+            print_r($this->operations);
+        }
     }
     public function __destruct() {
         if($this->op_count > 0) {
