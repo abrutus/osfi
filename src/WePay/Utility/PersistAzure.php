@@ -49,6 +49,7 @@ class PersistAzure {
         $this->service->batch($this->operations);
         $this->op_count = 0;
         $this->operations = new BatchOperations();
+        $this->rowkeys = [];
         echo $this->total . " Flushing \n";
         } catch(\Exception $e) {
             echo "Failed " . $e;
