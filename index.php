@@ -28,10 +28,37 @@ $app->get('/osfi/exactname/:name', function ($name) use ($app) {
     $app->render(200, ['count' => count($result_array), 'time' => $time, 'entities' => $result_array, ]);
 });
 
+$app->get('/osfi/exactnames/:name', function ($name) use ($app) {
+    $names = explode(",", $name);
+    $result_array = [];
+    $time_start = $app->timer;
+    foreach($names as $name) {
+          $result = Osfi::query(Osfi::TYPE_EXACT, $app->tableClient, 'osfi', $name);
+          if($result) $result_array[] = $result;
+    }
+    $time_end = $app->timer;
+    $time = $time_end - $time_start;
+
+    $app->render(200, ['count' => count($result_array), 'time' => $time, 'entities' => $result_array, ]);
+});
 
 $app->get('/ofac/exactname/:name', function ($name) use ($app) {
     $time_start = $app->timer;
     $result_array = Ofac::query(Ofac::TYPE_EXACT, $app->tableClient, 'ofac', $name);
+    $time_end = $app->timer;
+    $time = $time_end - $time_start;
+
+    $app->render(200, ['count' => count($result_array), 'time' => $time, 'entities' => $result_array, ]);
+});
+
+$app->get('/ofac/exactnames/:name', function ($name) use ($app) {
+    $names = explode(",", $name);
+    $result_array = [];
+    $time_start = $app->timer;
+    foreach($names as $name) {
+        $result[] = Ofac::query(Ofac::TYPE_EXACT, $app->tableClient, 'ofac', $name);
+        if($result) $result_array[] = $result;
+    }
     $time_end = $app->timer;
     $time = $time_end - $time_start;
 
