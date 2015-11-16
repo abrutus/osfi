@@ -56,7 +56,7 @@ $app->get('/ofac/exactnames/:name', function ($name) use ($app) {
     $result_array = [];
     $time_start = $app->timer;
     foreach($names as $name) {
-        $result[] = Ofac::query(Ofac::TYPE_EXACT, $app->tableClient, 'ofac', $name);
+        $result = Ofac::query(Ofac::TYPE_EXACT, $app->tableClient, 'ofac', $name);
         if($result) $result_array[] = $result;
     }
     $time_end = $app->timer;
